@@ -2,6 +2,7 @@
 using BAM.DataAccessLayer.Interfaces;
 using BAM.Domain.Models;
 using BAM.Infra.Database;
+using BAM.Infra.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -20,7 +21,7 @@ namespace BAM.DataAccessLayer.Repos
             _logger = logger;
         }
 
-        public async Task<Account?> GetAsync(int id)
+        public async Task<Account?> GetByIdAsync(int id)
         {
             _logger.LogInformation("GetAsync called for id {Guid}", id);
             var any = await _ctx.Accounts.Where(u => u.Id == id).AnyAsync();
@@ -33,6 +34,42 @@ namespace BAM.DataAccessLayer.Repos
             var entity = await _ctx.Accounts.Where(u => u.Id == id).FirstAsync();
             _logger.LogInformation("GetAsync: found account for id {Guid}", id);
             return _mapper.Map<Account>(entity);
+        }
+
+        public async Task UpdateAsync(Account account)
+        {
+            _logger.LogInformation("UpdateAsync called for id {Id}", account?.Id);
+            if (account != null)
+            {
+                try
+                {
+                    var existing = await _ctx.Accounts.FirstOrDefaultAsync(u => u.Id == account.Id);
+                    if (existing != null)
+                    {
+                        _logger.LogDebug("UpdateAsync: mapping incoming account onto tracked entity for id {Id}", account.Id);
+                        _mapper.Map(account, existing);
+                    }
+                    else
+                    {
+                        _logger.LogDebug("UpdateAsync: attaching new entity for id {Id}", account.Id);
+                        var newEntity = _mapper.Map<AccountEntity>(account);
+                        _ctx.Accounts.Attach(newEntity);
+                        _ctx.Entry(newEntity).State = EntityState.Modified;
+                    }
+
+                    await _ctx.SaveChangesAsync();
+                    _logger.LogInformation("UpdateAsync: saved changes for id {Id}", account.Id);
+                }
+                catch (System.Exception ex)
+                {
+                    _logger.LogError(ex, "UpdateAsync: error updating account id {Id}", account.Id);
+                    throw;
+                }
+            }
+            else
+            {
+                _logger.LogWarning("UpdateAsync called with null account");
+            }
         }
 
         public async Task TransferMoneyBetweenAccountsAsync(int fromAccountId, int toAccountId, decimal amount)
@@ -79,7 +116,7 @@ namespace BAM.DataAccessLayer.Repos
         public async Task<IList<Account>> GetAllByCustomerId(int customerId)
         {
             _logger.LogInformation("GetAllByCustomerId called");
-            var list = (await _ctx.Customers.Where(a => a.Id == customerId).AsNoTracking().FirstAsync())?.Accounts.ToList();
+            var list = await _ctx.Accounts.Where(a => a.CustomerId == customerId).AsNoTracking().ToListAsync();
             _logger.LogInformation("GetAllByCustomerId: returning {Count} accounts", list?.Count);
             return _mapper.Map<IList<Account>>(list);
         }
@@ -92,11 +129,6 @@ namespace BAM.DataAccessLayer.Repos
         }
 
         public async Task<IList<Account>> GetAllAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task UpdateAsync(Account account)
         {
             throw new NotImplementedException();
         }

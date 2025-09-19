@@ -22,12 +22,6 @@ namespace BAM.Infra.Configurations
 
             builder.HasIndex(x => x.BIC)
                 .IsUnique();
-
-            builder.HasMany(b => b.Accounts)
-                .WithOne(a => a.Bank!)
-                .HasForeignKey(a => a.BankId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

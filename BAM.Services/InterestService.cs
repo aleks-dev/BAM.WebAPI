@@ -1,5 +1,5 @@
-﻿using BAM.Domain.Calculators;
-using BAM.Domain.Enums;
+﻿using BAM.Contracts.Enums;
+using BAM.Domain.Calculators;
 using Microsoft.Extensions.Logging;
 
 namespace BAM.Services
@@ -20,7 +20,9 @@ namespace BAM.Services
             if (creditRating < 20)
                 throw new InvalidOperationException("Credit rating too low for loan");
 
-            if (durationYears != (int)LoanDuration.OneYear || durationYears != (int)LoanDuration.ThreeYears || durationYears != (int)LoanDuration.FiveYears)
+            if (durationYears != (int)LoanDuration.OneYear 
+                && durationYears != (int)LoanDuration.ThreeYears 
+                && durationYears != (int)LoanDuration.FiveYears)
                 throw new ArgumentOutOfRangeException(nameof(durationYears));
 
             _logger.LogInformation("Calculating interest rate for credit rating {CreditRating} and duration {DurationYears}", creditRating, durationYears);

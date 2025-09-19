@@ -1,4 +1,4 @@
-﻿using BAM.Domain.Enums;
+﻿using BAM.Contracts.Enums;
 
 namespace BAM.Domain.Models
 {
@@ -7,7 +7,6 @@ namespace BAM.Domain.Models
         public int Id { get; private set; }
 
         public int BankId { get; private set; }
-        public Bank Bank { get; private set; } = null!;
 
         public Guid BankAccountGuid { get; init; } = Guid.NewGuid();
 

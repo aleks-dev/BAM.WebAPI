@@ -14,12 +14,6 @@ namespace BAM.WebAPI.Controllers
             _interestService = interestService;
         }
 
-        // GET api/interest/rate?creditRating=80&durationYears=3
-        [HttpGet("rate")]
-        public ActionResult<decimal> GetRate([FromQuery] int creditRating, [FromQuery] int durationYears)
-        {
-            var rate = _interestService.GetInterestRate(creditRating, durationYears);
-            return Ok(rate);
-        }
+        
     }
 }

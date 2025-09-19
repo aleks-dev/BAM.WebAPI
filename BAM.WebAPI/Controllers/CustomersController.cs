@@ -1,5 +1,6 @@
 using BAM.Contracts.DTO;
-using BAM.DataAccessLayer.Interfaces;
+using BAM.Services;
+using BAM.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BAM.WebAPI.Controllers
@@ -8,43 +9,40 @@ namespace BAM.WebAPI.Controllers
     [Route("api/[controller]")]
     public class CustomersController : ControllerBase
     {
-        private readonly ICustomerRepo _customerRepo;
+        private readonly ICustomerService _customerService;
+        private readonly IAccountService _accountService;
+        private readonly IInterestService _interestService;
 
-        public CustomersController(ICustomerRepo customerRepo)
+        public CustomersController(ICustomerService customerService, IAccountService accountService, IInterestService interestService)
         {
-            _customerRepo = customerRepo;
-        }
-
-        // GET api/customers
-        [HttpGet]
-        public async Task<ActionResult<IList<CustomerDto>>> GetAll()
-        {
-            var customers = await _customerRepo.GetAllAsync();
-            var result = customers.Select(c => new CustomerDto
-            {
-                Id = c.Id,
-                Name = c.Name,
-                CreditRating = c.CreditRating
-            }).ToList();
-
-            return Ok(result);
+            _customerService = customerService;
+            _accountService = accountService;
+            _interestService = interestService;
         }
 
         // GET api/customers/5
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<CustomerDto>> Get(int id)
+        public async Task<ActionResult<CustomerDto>> Get([FromRoute] int id)
         {
-            var c = await _customerRepo.GetAsync(id);
-            if (c == null) return NotFound();
+            var customer = await _customerService.GetByIdAsync(id);
+            if (customer == null) 
+                return NotFound("Customer Not Found");
 
-            var dto = new CustomerDto
-            {
-                Id = c.Id,
-                Name = c.Name,
-                CreditRating = c.CreditRating
-            };
+            customer.Accounts = await _accountService.GetAccountsByCustomerIdAsync(id);
+            
+            return Ok(customer);
+        }
 
-            return Ok(dto);
+        // GET api/customers/5/interestrate?durationYears=3
+        [HttpGet("{id:int}/interestrate")]
+        public async Task<ActionResult<decimal>> GetRate([FromRoute] int id, [FromQuery] int durationYears)
+        {
+            var customer = await _customerService.GetByIdAsync(id);
+            if (customer == null)
+                return NotFound("Customer Not Found");
+
+            var rate = _interestService.GetInterestRate(customer.CreditRating, durationYears);
+            return Ok(rate);
         }
     }
 }

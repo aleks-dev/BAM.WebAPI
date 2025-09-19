@@ -18,7 +18,7 @@ namespace BAM.DataAccessLayer.Repos
             _ctx = ctx; _mapper = mapper; _logger = logger;
         }
 
-        public async Task<Customer?> GetAsync(int id)
+        public async Task<Customer?> GetByIdAsync(int id)
         {
             _logger.LogInformation("GetAsync called for id {Id}", id);
             var any = await _ctx.Customers.Where(u => u.Id == id).AnyAsync();

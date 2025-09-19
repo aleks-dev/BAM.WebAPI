@@ -1,10 +1,10 @@
-﻿using BAM.Domain.Models;
+﻿using BAM.Contracts.DTO;
 
 namespace BAM.Services.Interfaces
 {
     public interface IAccountService
     {
-        Task<IList<Account>> GetAccountsByCustomerIdAsync(int customerId);
-        Task TransferMoneyBetweenAccountsAsync(int fromAccountId, int toAccountId, decimal amount);
+        Task<IList<AccountDto>> GetAccountsByCustomerIdAsync(int customerId);
+        Task TransferMoneyBetweenAccountsAsync(TransferDto transfer);
     }
 }

@@ -10,9 +10,7 @@ namespace BAM.Domain.Models
 
         [Range(1, 100)]
         public int CreditRating { get; set; }
-        
-        public IList<Account> Accounts { get; set; } = new List<Account>();
 
-        public IList<Loan>? Loans { get; set; }
+        public IList<Account> Accounts { get; set; } = new List<Account>();
     }
 }

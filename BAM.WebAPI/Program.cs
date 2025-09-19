@@ -8,7 +8,9 @@ using BAM.Services;
 using BAM.Services.Interfaces;
 using BAM.WebAPI;
 using BAM.WebAPI.Mapping;
+using BAM.WebAPI.Options;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,23 +31,22 @@ builder.Services.AddScoped<ICustomerRepo, CustomerRepo>();
 
 builder.Services.AddScoped<ILoanService, LoanService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddScoped<IInterestRateCalc, InterestRateCalc>(rc => new InterestRateCalc(InterestRateRules.GetDefaultRules()));
-builder.Services.AddScoped<IInterestRateRule, RangeInterestRateRule>(rir => 
-    new RangeInterestRateRule(minInclusive: 20, maxExclusive: 50, new Dictionary<int, decimal>
-    {
-        [1] = 20m,
-        [3] = 15m,
-        [5] = 10m
-    }));
-builder.Services.AddScoped<IInterestRateRule, RangeInterestRateRule>(rir =>
-    new RangeInterestRateRule(minInclusive: 50, maxExclusive: 101, new Dictionary<int, decimal>
-    {
-        [1] = 12m,
-        [3] = 8m,
-        [5] = 5m
-    }));
+
+builder.Services.Configure<InterestRateRulesOptions>(builder.Configuration.GetSection("InterestRateRules"));
+builder.Services.AddScoped<IInterestRateCalc>(sp =>
+{
+    var opts = sp.GetRequiredService<IOptions<InterestRateRulesOptions>>().Value;
+    var rules = opts.Rules
+        .Select(r => new RangeInterestRateRule(r.MinInclusive, r.MaxExclusive, r.RatesByDuration))
+        .Cast<IInterestRateRule>()
+        .ToList();
+
+    return new InterestRateCalc(rules);
+});
+
 builder.Services.AddScoped<IInterestService, InterestService>();
 builder.Services.AddScoped<IUnitOfWork, ApplyForLoanUnitOfWork>();
+builder.Services.AddScoped<ITransferBetweenAccountsUnitOfWork, TransferBetweenAccountsUnitOfWork>();
 
 var app = builder.Build();
 

@@ -18,7 +18,5 @@ namespace BAM.Infra.Entities
         [Required]
         [MaxLength(16)]
         public string BIC { get; set; } = string.Empty;
-
-        public ICollection<AccountEntity> Accounts { get; set; } = new List<AccountEntity>();
     }
 }

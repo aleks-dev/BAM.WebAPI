@@ -15,28 +15,11 @@ namespace BAM.WebAPI.Controllers
             _accountService = accountService;
         }
 
-        // GET api/accounts/customer/5
-        [HttpGet("customer/{customerId:int}")]
-        public async Task<ActionResult<IList<AccountDto>>> GetAccountsByCustomer(int customerId)
-        {
-            var accounts = await _accountService.GetAccountsByCustomerIdAsync(customerId);
-            var result = accounts.Select(a => new AccountDto
-            {
-                AccountId = a.Id,
-                BankId = a.Bank.Id,
-                BankAccountGuid = a.BankAccountGuid,
-                Balance = a.Balance,
-                AccountType = a.AccountType
-            }).ToList();
-
-            return Ok(result);
-        }
-
         // POST api/accounts/transfer
         [HttpPost("transfer")]
-        public async Task<IActionResult> Transfer([FromQuery] int fromAccountId, [FromQuery] int toAccountId, [FromQuery] decimal amount)
+        public async Task<IActionResult> Transfer([FromBody] TransferDto transfer)
         {
-            await _accountService.TransferMoneyBetweenAccountsAsync(fromAccountId, toAccountId, amount);
+            await _accountService.TransferMoneyBetweenAccountsAsync(transfer);
             return NoContent();
         }
     }

@@ -11,7 +11,7 @@ namespace BAM.DataAccessLayer.UnitOfWork
         /// Performs IncreaseAccountBalanceByAmountAsync and AddAsync(loan) as a single transactional operation.
         /// Throws exceptions on failure so callers can decide how to handle them.
         /// </summary>
-        Task ApplyLoanTransactionAsync(int accountId, Loan loan, decimal amount);
+        Task ApplyForLoanAsync(Loan loan);
     }
 
     public class ApplyForLoanUnitOfWork : IUnitOfWork
@@ -25,29 +25,28 @@ namespace BAM.DataAccessLayer.UnitOfWork
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task ApplyLoanTransactionAsync(int accountId, Loan loan, decimal amount)
+        public async Task ApplyForLoanAsync(Loan loan)
         {
             if (loan is null)
                 throw new ArgumentNullException(nameof(loan));
-            if (amount < 0)
-                throw new ArgumentOutOfRangeException(nameof(amount));
+            if (loan.Amount <= 0)
+                throw new ArgumentOutOfRangeException(nameof(loan.Amount));
 
-            // TransactionScope ensures both operations are committed or rolled back together.
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
             try
             {
-                await _loanRepo.IncreaseAccountBalanceByAmountAsync(accountId, amount).ConfigureAwait(false);
-                _logger.LogDebug("Increased account balance by {Amount} for account {AccountId}", amount, accountId);
+                await _loanRepo.IncreaseAccountBalanceByAmountAsync(loan.Account.Id, loan.Amount);
+                _logger.LogDebug("Increased account balance by {Amount} for account {AccountId}", loan.Amount, loan.Account.Id);
 
-                await _loanRepo.AddAsync(loan).ConfigureAwait(false);
-                _logger.LogDebug("Added loan entity for account {AccountId} with amount {Amount}", accountId, amount);
+                await _loanRepo.AddAsync(loan);
+                _logger.LogDebug("Added loan entity for account {AccountId} with amount {Amount}", loan.Account.Id, loan.Amount);
 
                 scope.Complete();
-                _logger.LogInformation("UnitOfWork transaction completed for account {AccountId}", accountId);
+                _logger.LogInformation("UnitOfWork transaction completed for account {AccountId}", loan.Account.Id);
             }
             catch
             {
-                _logger.LogWarning("UnitOfWork transaction failed for account {AccountId}; rolling back", accountId);
+                _logger.LogWarning("UnitOfWork transaction failed for account {AccountId}; rolling back", loan.Account.Id);
                 throw;
             }
         }

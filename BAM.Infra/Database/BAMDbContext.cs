@@ -1,7 +1,6 @@
-﻿using BAM.Domain.Enums;
+﻿using BAM.Contracts.Enums;
 using BAM.Infra.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BAM.Infra.Database
 {

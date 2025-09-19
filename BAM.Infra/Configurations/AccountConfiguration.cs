@@ -14,10 +14,11 @@ namespace BAM.Infra.Configurations
 
             builder.Property(x => x.BankId).IsRequired();
             builder.Property(x => x.CustomerId).IsRequired();
+            builder.HasIndex(x => new { x.BankId, x.CustomerId} )
+                   .IsUnique();
 
             builder.Property(x => x.BankAccountId)
                    .IsRequired();
-
             builder.HasIndex(x => x.BankAccountId)
                    .IsUnique();
 
@@ -27,18 +28,6 @@ namespace BAM.Infra.Configurations
 
             builder.Property(x => x.AccountType)
                    .IsRequired();
-
-            builder.HasOne(a => a.Bank)
-                   .WithMany(b => b.Accounts)
-                   .HasForeignKey(a => a.BankId)
-                   .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne(a => a.Customer)
-                   .WithMany(c => c.Accounts)
-                   .HasForeignKey(a => a.CustomerId)
-                   .OnDelete(DeleteBehavior.Cascade);
-
-            builder.HasOne(a => a.Loan);
         }
     }
 }

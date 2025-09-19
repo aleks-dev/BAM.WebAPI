@@ -1,7 +1,7 @@
 ﻿
 using AutoMapper;
+using BAM.Contracts.Enums;
 using BAM.DataAccessLayer.Repos;
-using BAM.Domain.Enums;
 using BAM.Domain.Models;
 using BAM.Infra.Database;
 using BAM.Infra.Entities;
@@ -35,7 +35,7 @@ namespace BAM.DataAccessLayer.Tests.Repos
             var mapperMock = new Mock<IMapper>();
             var repo = CreateRepo(ctx, mapperMock);
 
-            var result = await repo.GetAsync(123);
+            var result = await repo.GetByIdAsync(123);
 
             Assert.Null(result);
             mapperMock.Verify(m => m.Map<Account>(It.IsAny<object>()), Times.Never);
@@ -67,7 +67,7 @@ namespace BAM.DataAccessLayer.Tests.Repos
 
             var repo = CreateRepo(ctx, mapperMock);
 
-            var result = await repo.GetAsync(1);
+            var result = await repo.GetByIdAsync(1);
 
             Assert.Same(mappedAccount, result);
             mapperMock.Verify(m => m.Map<Account>(It.IsAny<object>()), Times.Once);
@@ -94,7 +94,6 @@ namespace BAM.DataAccessLayer.Tests.Repos
                 Id = 5,
                 Name = "Test Customer",
                 CreditRating = 50,
-                Accounts = new List<AccountEntity> { acc1 }
             };
 
             ctx.Customers.Add(customer);
@@ -113,17 +112,6 @@ namespace BAM.DataAccessLayer.Tests.Repos
 
             Assert.Same(expectedList, result);
             mapperMock.Verify(m => m.Map<IList<Account>>(It.IsAny<object>()), Times.Once);
-        }
-
-        [Fact]
-        public async Task GetAllByCustomerId_Throws_WhenCustomerNotFound()
-        {
-            var ctx = CreateContext(Guid.NewGuid().ToString());
-            var mapperMock = new Mock<IMapper>();
-            var repo = CreateRepo(ctx, mapperMock);
-
-            await Assert.ThrowsAsync<InvalidOperationException>(() => repo.GetAllByCustomerId(999));
-            mapperMock.Verify(m => m.Map<IList<Account>>(It.IsAny<object>()), Times.Never);
         }
 
         [Fact]

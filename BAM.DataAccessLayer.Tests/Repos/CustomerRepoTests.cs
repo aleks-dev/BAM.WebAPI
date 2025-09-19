@@ -38,7 +38,7 @@ namespace BAM.DataAccessLayer.Tests.Repos
             var repo = CreateRepo(ctx, mapper);
 
             // Act
-            var result = await repo.GetAsync(12345);
+            var result = await repo.GetByIdAsync(12345);
 
             // Assert
             Assert.Null(result);
@@ -63,7 +63,7 @@ namespace BAM.DataAccessLayer.Tests.Repos
             var repo = CreateRepo(ctx, mapper);
 
             // Act
-            var result = await repo.GetAsync(1);
+            var result = await repo.GetByIdAsync(1);
 
             // Assert
             Assert.NotNull(result);

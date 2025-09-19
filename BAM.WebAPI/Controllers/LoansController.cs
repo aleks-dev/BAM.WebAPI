@@ -17,9 +17,9 @@ namespace BAM.WebAPI.Controllers
 
         // POST api/loans/apply
         [HttpPost("apply")]
-        public async Task<ActionResult<bool>> Apply([FromQuery] int customerId, [FromQuery] int accountId, [FromQuery] decimal amount, [FromQuery] int durationYears)
+        public async Task<ActionResult<bool>> Apply([FromBody] LoanApplicationDto loanApplication)
         {
-            var approved = await _loanService.ApplyForLoanAsync(customerId, accountId, amount, durationYears);
+            var approved = await _loanService.ApplyForLoanAsync(loanApplication);
             return Ok(approved);
         }
     }

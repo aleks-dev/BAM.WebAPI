@@ -24,7 +24,7 @@ namespace BAM.DataAccessLayer.Repos
             throw new NotImplementedException();
         }
 
-        public async Task<Loan?> GetAsync(int id)
+        public async Task<Loan?> GetByIdAsync(int id)
         {
             _logger.LogInformation("GetAsync called for id {Id}", id);
             var any = await _ctx.Loans.Where(u => u.Id == id).AnyAsync();

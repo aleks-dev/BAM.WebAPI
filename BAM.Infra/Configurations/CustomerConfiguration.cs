@@ -18,12 +18,6 @@ namespace BAM.Infra.Configurations
 
             builder.Property(x => x.CreditRating)
                 .IsRequired();
-
-            builder.HasMany(c => c.Accounts)
-                .WithOne(a => a.Customer!)
-                .HasForeignKey(a => a.CustomerId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

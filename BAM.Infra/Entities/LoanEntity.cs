@@ -1,4 +1,4 @@
-﻿using BAM.Domain.Enums;
+﻿using BAM.Contracts.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,6 +12,8 @@ namespace BAM.Infra.Entities
         public int Id { get; set; }
 
         public int AccountId { get; set; }
+
+        public int CustomerId { get; set; }
 
         public LoanDuration Duration { get; set; }
 

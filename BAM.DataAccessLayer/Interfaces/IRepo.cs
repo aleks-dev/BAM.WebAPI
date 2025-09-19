@@ -4,7 +4,7 @@
     {
         Task AddAsync(T obj);
 
-        Task<T?> GetAsync(int id);
+        Task<T?> GetByIdAsync(int id);
 
         Task<IList<T>> GetAllAsync();
 

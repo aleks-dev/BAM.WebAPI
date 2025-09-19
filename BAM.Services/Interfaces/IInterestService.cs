@@ -1,6 +1,4 @@
-﻿using BAM.Domain.Calculators;
-
-namespace BAM.Services
+﻿namespace BAM.Services
 {
     public interface IInterestService
     {
