@@ -14,10 +14,6 @@
     {
         private readonly IReadOnlyList<IInterestRateRule> _rules;
 
-        public InterestRateCalc() : this(InterestRateRules.GetDefaultRules())
-        {
-        }
-
         public InterestRateCalc(IEnumerable<IInterestRateRule> rules)
         {
             if (rules == null)
